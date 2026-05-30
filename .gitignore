@@ -1,0 +1,60 @@
+# Java / Maven
+target/
+.mvn/wrapper/maven-wrapper.jar
+*.class
+*.jar
+*.war
+*.ear
+*.ctxt
+
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+### VS Code ###
+.vscode/
+# Help files
+HELP.md
+
+### Database (H2, SQLite, etc) ###
+data/
+*.mv.db
+*.trace.db
+
+### Logs and OS ###
+*.log
+.DS_Store
+Thumbs.db
+
+# Virtual Machine / Logs
+*.log
+crash.dump
+dump.rdb
+
+
+
+
