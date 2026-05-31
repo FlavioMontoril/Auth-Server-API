@@ -48,13 +48,16 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(users);
     }
 
+    private static final int MAX_PAGE_SIZE = 20;
+
     @GetMapping("/held")
     public ResponseEntity<PageResponseDTO<UserResponseDTO>> getAllUsersHeld(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
     ) {
 
-        PageResponseDTO<UserResponseDTO> usersPagination = this.userService.findAllPagination(page, size);
+        int validateSize = Math.min(size, MAX_PAGE_SIZE);
+        PageResponseDTO<UserResponseDTO> usersPagination = this.userService.findAllPagination(page, validateSize);
         return ResponseEntity.status(HttpStatus.OK).body(usersPagination);
     }
 
