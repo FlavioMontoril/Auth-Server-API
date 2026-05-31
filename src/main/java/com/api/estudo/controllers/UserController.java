@@ -10,8 +10,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.api.estudo.domain.dtos.common.PageResponseDTO;
 import com.api.estudo.domain.dtos.user.UserRequestDTO;
 import com.api.estudo.domain.dtos.user.UserResponseDTO;
 import com.api.estudo.services.UserService;
@@ -44,6 +46,16 @@ public class UserController {
     public ResponseEntity<List<UserResponseDTO>> getAll() {
         var users = this.userService.findAll();
         return ResponseEntity.status(HttpStatus.OK).body(users);
+    }
+
+    @GetMapping("/held")
+    public ResponseEntity<PageResponseDTO<UserResponseDTO>> getAllUsersHeld(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+
+        PageResponseDTO<UserResponseDTO> usersPagination = this.userService.findAllPagination(page, size);
+        return ResponseEntity.status(HttpStatus.OK).body(usersPagination);
     }
 
 }
