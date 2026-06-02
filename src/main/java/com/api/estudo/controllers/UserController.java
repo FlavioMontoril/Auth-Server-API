@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.api.estudo.domain.dtos.common.MessageResponseDTO;
 import com.api.estudo.domain.dtos.common.PageResponseDTO;
 import com.api.estudo.domain.dtos.user.UserRequestDTO;
 import com.api.estudo.domain.dtos.user.UserResponseDTO;
@@ -26,14 +27,14 @@ public class UserController {
 
     private final UserService userService;
 
-    public UserController(UserService userService) {
+    private UserController(UserService userService) {
         this.userService = userService;
     }
 
     @PostMapping
-    public ResponseEntity<Void> create(@RequestBody @Valid UserRequestDTO data) {
+    public ResponseEntity<MessageResponseDTO> create(@Valid @RequestBody UserRequestDTO data) {
         this.userService.save(data);
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+        return ResponseEntity.status(HttpStatus.CREATED).body(new MessageResponseDTO("Created User Succesfully"));
     }
 
     @GetMapping("/{userId}")
@@ -54,7 +55,7 @@ public class UserController {
     public ResponseEntity<PageResponseDTO<UserResponseDTO>> getAllUsersHeld(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
-    ) {
+        ) {
 
         int validateSize = Math.min(size, MAX_PAGE_SIZE);
         PageResponseDTO<UserResponseDTO> usersPagination = this.userService.findAllPagination(page, validateSize);
