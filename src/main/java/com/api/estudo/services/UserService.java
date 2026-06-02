@@ -8,6 +8,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.api.estudo.domain.dtos.common.PageResponseDTO;
 import com.api.estudo.domain.dtos.user.UserRequestDTO;
@@ -28,37 +29,30 @@ public class UserService {
         this.passwordEncoder = passwordEncoder;
     }
 
+    @Transactional
     public void save(UserRequestDTO data) {
 
         this.userRepository
                 .findByEmail(data.email())
                 .ifPresent(user -> {
-                    throw new DataConflictException("Já existe usuário com este email no sistema");
+                    throw new DataConflictException("Existe usuário cadastrado com este email no sistema");
                 });
-
-        User user = new User();
 
         String encryptedPassword = this.passwordEncoder.encode(data.password());
 
-        user.setName(data.name());
-        user.setEmail(data.email());
-        user.setPassword(encryptedPassword);
+        User user = User.builder()
+                .name(data.name())
+                .email(data.email())
+                .password(encryptedPassword)
+                .build();
 
         this.userRepository.save(user);
     }
 
+    @Transactional(readOnly = true)
     public PageResponseDTO<UserResponseDTO> findAllPagination(int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
 
-        // EXPRESSAO LAMBDA
-        // Page<UserResponseDTO> users = this.userRepository.findAll(pageable).map(user
-        // -> new UserResponseDTO(
-        // user.getId(),
-        // user.getName(),
-        // user.getEmail(),
-        // user.getCreatedAt()));
-
-        // FORMA REDUZIDA DA EXPRESSAO LAMBDA
         Page<UserResponseDTO> users = this.userRepository.findAll(pageable).map(UserResponseDTO::new);
 
         return new PageResponseDTO<>(
@@ -69,6 +63,7 @@ public class UserService {
                 users.getTotalElements());
     }
 
+    @Transactional(readOnly = true)
     public UserResponseDTO findById(UUID userId) {
         User user = this.userRepository
                 .findById(userId)
@@ -77,6 +72,7 @@ public class UserService {
         return new UserResponseDTO(user);
     }
 
+    @Transactional(readOnly = true)
     public List<UserResponseDTO> findAll() {
         return this.userRepository
                 .findAll()
