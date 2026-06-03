@@ -18,16 +18,14 @@ import com.api.estudo.domain.exceptions.DataConflictException;
 import com.api.estudo.domain.exceptions.ResourceNotFoundException;
 import com.api.estudo.domain.repositories.UserRepository;
 
+import lombok.RequiredArgsConstructor;
+
 @Service
+@RequiredArgsConstructor
 public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
-        this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
-    }
 
     @Transactional
     public void save(UserRequestDTO data) {
