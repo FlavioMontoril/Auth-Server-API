@@ -20,16 +20,14 @@ import com.api.estudo.domain.dtos.user.UserResponseDTO;
 import com.api.estudo.services.UserService;
 
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/api/users")
 public class UserController {
 
     private final UserService userService;
-
-    private UserController(UserService userService) {
-        this.userService = userService;
-    }
 
     @PostMapping
     public ResponseEntity<MessageResponseDTO> create(@Valid @RequestBody UserRequestDTO data) {
@@ -54,8 +52,7 @@ public class UserController {
     @GetMapping("/held")
     public ResponseEntity<PageResponseDTO<UserResponseDTO>> getAllUsersHeld(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size
-        ) {
+            @RequestParam(defaultValue = "10") int size) {
 
         int validateSize = Math.min(size, MAX_PAGE_SIZE);
         PageResponseDTO<UserResponseDTO> usersPagination = this.userService.findAllPagination(page, validateSize);
