@@ -1,0 +1,2 @@
+ALTER TABLE users
+ADD COLUMN role_id CHAR(36) NOT NULL;

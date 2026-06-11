@@ -1,0 +1,5 @@
+CREATE TABLE IF NOT EXISTS roles(
+    id CHAR(36) PRIMARY KEY NOT NULL,
+    name CHAR(10) NOT NULL,
+    created_at TIMESTAMP NOT NULL
+)
