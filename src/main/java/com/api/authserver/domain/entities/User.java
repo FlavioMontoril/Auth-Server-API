@@ -44,11 +44,11 @@ public class User implements UserDetails {
     private UUID id;
 
     @Setter
-    @Column(nullable = false, updatable = false)
+    @Column(nullable = false, updatable = false, length = 50)
     private String name;
 
     @Setter
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false, unique = true, length = 100)
     private String email;
 
     @Setter
@@ -60,7 +60,7 @@ public class User implements UserDetails {
     @CreationTimestamp
     private LocalDateTime createdAt;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "role_id", nullable = false)
     private Role role;
 

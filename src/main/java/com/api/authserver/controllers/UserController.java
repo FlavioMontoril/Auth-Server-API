@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -23,6 +24,8 @@ import com.api.authserver.services.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
+// import org.springframework.security.access.prepost.PreAuthorize;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/users")
@@ -30,39 +33,46 @@ public class UserController {
 
     private final UserService userService;
 
+    @DeleteMapping("/{userId}")
+    // @PreAuthorize("hasAnyRole('ADMIN', 'MASTER')")
+    public ResponseEntity<MessageResponseDTO> delete(@PathVariable UUID userId) {
+        userService.delete(userId);
+        return ResponseEntity.status(HttpStatus.OK).body(new MessageResponseDTO("User deleted successfully"));
+    }
+
     @PostMapping
     public ResponseEntity<MessageResponseDTO> create(@Valid @RequestBody UserRequestDTO data) {
-        this.userService.save(data);
+        userService.saveUser(data);
         return ResponseEntity.status(HttpStatus.CREATED).body(new MessageResponseDTO("Created User Succesfully"));
     }
 
     @GetMapping("/{userId}")
     public ResponseEntity<UserResponseDTO> findById(@PathVariable UUID userId) {
-        var user = this.userService.findById(userId);
+        var user = userService.findUserById(userId);
         return ResponseEntity.status(HttpStatus.OK).body(user);
     }
 
     @GetMapping
     public ResponseEntity<List<UserResponseDTO>> getAll() {
-        var users = this.userService.findAll();
+        var users = userService.findAllUsers();
         return ResponseEntity.status(HttpStatus.OK).body(users);
     }
 
     private static final int MAX_PAGE_SIZE = 20;
 
-    @GetMapping("/held")
-    public ResponseEntity<PageResponseDTO<UserResponseDTO>> getAllUsersHeld(
+    @GetMapping("/paged")
+    public ResponseEntity<PageResponseDTO<UserResponseDTO>> getAllUsersPaged(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
 
         int validateSize = Math.min(size, MAX_PAGE_SIZE);
-        PageResponseDTO<UserResponseDTO> usersPagination = this.userService.findAllPagination(page, validateSize);
+        PageResponseDTO<UserResponseDTO> usersPagination = userService.findAllUsersPagination(page, validateSize);
         return ResponseEntity.status(HttpStatus.OK).body(usersPagination);
     }
 
     @GetMapping("/{userId}/role")
     public ResponseEntity<UserWithRoleResponseDTO> getUserWithRoleById(@PathVariable UUID userId) {
-        UserWithRoleResponseDTO userWithRole = this.userService.findUserWithRole(userId);
+        UserWithRoleResponseDTO userWithRole = userService.findUserWithRole(userId);
         return ResponseEntity.status(HttpStatus.OK).body(userWithRole);
     }
 
