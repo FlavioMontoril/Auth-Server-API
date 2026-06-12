@@ -6,6 +6,7 @@ target/
 *.war
 *.ear
 *.ctxt
+.env
 
 !**/src/main/**/target/
 !**/src/test/**/target/
