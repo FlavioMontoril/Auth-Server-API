@@ -23,7 +23,7 @@ public class RoleService {
 
     @Transactional
     public void saveRole(RoleRequestDTO data) {
-        this.roleRepository.findByName(data.name())
+        roleRepository.findByName(data.name())
                 .ifPresent(role -> {
                     throw new DataConflictException("Role is already registered");
                 });
@@ -32,17 +32,17 @@ public class RoleService {
                 .name(data.name())
                 .build();
 
-        this.roleRepository.save(role);
+        roleRepository.save(role);
     }
 
     public RoleResponseDTO findById(UUID roleId) {
-        Role role = this.roleRepository.findById(roleId)
+        Role role = roleRepository.findById(roleId)
                 .orElseThrow(() -> new ResourceNotFoundException("Role Not Found"));
 
         return new RoleResponseDTO(role);
     }
 
     public List<RoleResponseDTO> findAllRoles() {
-        return this.roleRepository.findAll().stream().map(RoleResponseDTO::new).toList();
+        return roleRepository.findAll().stream().map(RoleResponseDTO::new).toList();
     }
 }

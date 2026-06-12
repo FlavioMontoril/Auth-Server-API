@@ -20,22 +20,23 @@ import com.api.authserver.services.RoleService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
+
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/role")
+@RequestMapping("/api/roles")
 public class RoleController {
 
     private final RoleService roleService;
 
     @PostMapping
-    public ResponseEntity<MessageResponseDTO> createUser(@Valid @RequestBody RoleRequestDTO data) {
+    public ResponseEntity<MessageResponseDTO> createRole(@Valid @RequestBody RoleRequestDTO data) {
         this.roleService.saveRole(data);
         return ResponseEntity.status(HttpStatus.CREATED).body(new MessageResponseDTO("Role created Succesfully"));
     }
 
-    @GetMapping("/{userId}")
-    public ResponseEntity<RoleResponseDTO> findUserById(@PathVariable UUID userId) {
-        RoleResponseDTO role = this.roleService.findById(userId);
+    @GetMapping("/{roleId}")
+    public ResponseEntity<RoleResponseDTO> findRoleById(@PathVariable UUID roleId) {
+        RoleResponseDTO role = this.roleService.findById(roleId);
         return ResponseEntity.status(HttpStatus.OK).body(role);
     }
 

@@ -32,18 +32,18 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
 
     @Transactional
-    public void save(UserRequestDTO data) {
+    public void saveUser(UserRequestDTO data) {
 
-        this.userRepository
+        userRepository
                 .findByEmail(data.email())
                 .ifPresent(user -> {
                     throw new DataConflictException("Existe usuário cadastrado com este email no sistema");
                 });
 
-        Role role = this.roleRepository.findById(data.roleId())
+        Role role = roleRepository.findById(data.roleId())
                 .orElseThrow(() -> new ResourceNotFoundException("Role Not Found"));
 
-        String encryptedPassword = this.passwordEncoder.encode(data.password());
+        String encryptedPassword = passwordEncoder.encode(data.password());
 
         User user = User.builder()
                 .name(data.name())
@@ -52,13 +52,13 @@ public class UserService {
                 .role(role)
                 .build();
 
-        this.userRepository.save(user);
+        userRepository.save(user);
     }
 
-    public PageResponseDTO<UserResponseDTO> findAllPagination(int page, int size) {
+    public PageResponseDTO<UserResponseDTO> findAllUsersPagination(int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
 
-        Page<UserResponseDTO> users = this.userRepository.findAll(pageable).map(UserResponseDTO::new);
+        Page<UserResponseDTO> users = userRepository.findAll(pageable).map(UserResponseDTO::new);
 
         return new PageResponseDTO<>(
                 users.getContent(),
@@ -68,26 +68,33 @@ public class UserService {
                 users.getTotalElements());
     }
 
-    public UserResponseDTO findById(UUID userId) {
-        User user = this.userRepository
+    public UserResponseDTO findUserById(UUID userId) {
+        User user = userRepository
                 .findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado"));
 
         return new UserResponseDTO(user);
     }
 
-    public List<UserResponseDTO> findAll() {
-        return this.userRepository
-                .findAll()
+    public List<UserResponseDTO> findAllUsers() {
+        return userRepository
+                .findAllWithRoles()
                 .stream()
                 .map(UserResponseDTO::new)
                 .toList();
     }
 
     public UserWithRoleResponseDTO findUserWithRole(UUID userId) {
-        User usersWithRole = this.userRepository.findUserWithRoleById(userId)
+        User usersWithRole = userRepository.findUserWithRoleById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User Not Found"));
 
         return new UserWithRoleResponseDTO(usersWithRole);
+    }
+
+    @Transactional
+    public void delete(UUID userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado"));
+        userRepository.delete(user);
     }
 }
