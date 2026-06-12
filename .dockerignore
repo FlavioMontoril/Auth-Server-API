@@ -1,5 +1,6 @@
 # Ignorar a pasta de build local (evita conflitos e lentidão)
 target/
+.env
 
 
 # Ignorar pastas de configuração da IDE (Eclipse, IntelliJ, VS Code)
