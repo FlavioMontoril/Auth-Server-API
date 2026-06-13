@@ -11,7 +11,14 @@ FROM eclipse-temurin:21-jre-alpine
 
 WORKDIR /app
 
+# Cria um usuário e grupo para não rodar como root
+RUN addgroup -S spring && adduser -S spring -G spring
+
+# Copia o jar definindo o novo usuário como dono
 COPY --from=build /app/target/auth-server-0.0.1-SNAPSHOT.jar /app/app.jar
+
+# Define que o container deve rodar com o usuário criado
+USER spring
 
 EXPOSE 8080
 
