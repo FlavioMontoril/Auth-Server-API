@@ -2,6 +2,9 @@
 target/
 .env
 
+# DESENVOLVIMENTO
+src/main/resources/application-local.properties
+
 
 # Ignorar pastas de configuração da IDE (Eclipse, IntelliJ, VS Code)
 .idea/
