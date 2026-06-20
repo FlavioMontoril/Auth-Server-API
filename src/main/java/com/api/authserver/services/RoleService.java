@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.api.authserver.domain.dtos.role.RoleRequestDTO;
 import com.api.authserver.domain.dtos.role.RoleResponseDTO;
@@ -12,7 +13,6 @@ import com.api.authserver.domain.exceptions.DataConflictException;
 import com.api.authserver.domain.exceptions.ResourceNotFoundException;
 import com.api.authserver.domain.repositories.RoleRepository;
 
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service
