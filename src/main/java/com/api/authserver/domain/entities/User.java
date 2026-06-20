@@ -44,7 +44,7 @@ public class User implements UserDetails {
     private UUID id;
 
     @Setter
-    @Column(nullable = false, updatable = false, length = 50)
+    @Column(nullable = false)
     private String name;
 
     @Setter

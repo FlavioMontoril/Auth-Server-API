@@ -13,8 +13,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import com.api.authserver.domain.enums.RoleOptions;
-
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -32,13 +30,8 @@ public class SecurityConfig {
         return httpSecurity
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                // .authorizeHttpRequests(auth -> auth.anyRequest().permitAll())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/users")
-                        .hasAnyRole(RoleOptions.ADMIN.name(), RoleOptions.MASTER.name())
-                        .requestMatchers(HttpMethod.DELETE, "/api/users/*")
-                        .hasAnyRole(RoleOptions.ADMIN.name(), RoleOptions.MASTER.name())
                         .anyRequest().authenticated())
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();

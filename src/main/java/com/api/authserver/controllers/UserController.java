@@ -23,44 +23,47 @@ import com.api.authserver.services.UserService;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-
-// import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/users")
 public class UserController {
 
+    private static final int MAX_PAGE_SIZE = 20;
+
     private final UserService userService;
 
     @DeleteMapping("/{userId}")
-    // @PreAuthorize("hasAnyRole('ADMIN', 'MASTER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'MASTER')")
     public ResponseEntity<MessageResponseDTO> delete(@PathVariable UUID userId) {
         userService.delete(userId);
         return ResponseEntity.status(HttpStatus.OK).body(new MessageResponseDTO("User deleted successfully"));
     }
 
     @PostMapping
+    @PreAuthorize("hasAnyRole('ADMIN', 'MASTER')")
     public ResponseEntity<MessageResponseDTO> create(@Valid @RequestBody UserRequestDTO data) {
         userService.saveUser(data);
-        return ResponseEntity.status(HttpStatus.CREATED).body(new MessageResponseDTO("Created User Succesfully"));
+        return ResponseEntity.status(HttpStatus.CREATED).body(new MessageResponseDTO("User created successfully"));
     }
 
     @GetMapping("/{userId}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'MASTER')")
     public ResponseEntity<UserResponseDTO> findById(@PathVariable UUID userId) {
         var user = userService.findUserById(userId);
         return ResponseEntity.status(HttpStatus.OK).body(user);
     }
 
     @GetMapping
+    @PreAuthorize("hasAnyRole('ADMIN', 'MASTER')")
     public ResponseEntity<List<UserResponseDTO>> getAll() {
         var users = userService.findAllUsers();
         return ResponseEntity.status(HttpStatus.OK).body(users);
     }
 
-    private static final int MAX_PAGE_SIZE = 20;
-
     @GetMapping("/paged")
+    @PreAuthorize("hasAnyRole('ADMIN', 'MASTER')")
     public ResponseEntity<PageResponseDTO<UserResponseDTO>> getAllUsersPaged(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
@@ -71,6 +74,7 @@ public class UserController {
     }
 
     @GetMapping("/{userId}/role")
+    @PreAuthorize("hasAnyRole('ADMIN', 'MASTER')")
     public ResponseEntity<UserWithRoleResponseDTO> getUserWithRoleById(@PathVariable UUID userId) {
         UserWithRoleResponseDTO userWithRole = userService.findUserWithRole(userId);
         return ResponseEntity.status(HttpStatus.OK).body(userWithRole);

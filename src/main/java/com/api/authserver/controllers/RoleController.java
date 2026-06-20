@@ -19,6 +19,7 @@ import com.api.authserver.services.RoleService;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 
 @RestController
@@ -29,18 +30,21 @@ public class RoleController {
     private final RoleService roleService;
 
     @PostMapping
+    @PreAuthorize("hasAnyRole('ADMIN', 'MASTER')")
     public ResponseEntity<MessageResponseDTO> createRole(@Valid @RequestBody RoleRequestDTO data) {
         this.roleService.saveRole(data);
-        return ResponseEntity.status(HttpStatus.CREATED).body(new MessageResponseDTO("Role created Succesfully"));
+        return ResponseEntity.status(HttpStatus.CREATED).body(new MessageResponseDTO("Role created successfully"));
     }
 
     @GetMapping("/{roleId}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'MASTER')")
     public ResponseEntity<RoleResponseDTO> findRoleById(@PathVariable UUID roleId) {
         RoleResponseDTO role = this.roleService.findById(roleId);
         return ResponseEntity.status(HttpStatus.OK).body(role);
     }
 
     @GetMapping
+    @PreAuthorize("hasAnyRole('ADMIN', 'MASTER')")
     public ResponseEntity<List<RoleResponseDTO>> findAllRoles() {
         List<RoleResponseDTO> roles = this.roleService.findAllRoles();
         return ResponseEntity.status(HttpStatus.OK).body(roles);
