@@ -2,7 +2,7 @@ services:
   db:
     image: postgres:16-alpine
     container_name: auth-server-db
-    restart: always
+    restart: unless-stopped
     environment:
       POSTGRES_DB: ${DOCKER_DB_NAME}
       POSTGRES_USER: ${DOCKER_DB_USERNAME}
@@ -15,24 +15,36 @@ services:
       timeout: 5s
       retries: 5
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - auth_server_db_data:/var/lib/postgresql/data
+    networks:
+      - auth-server-network
 
   api:
     build: .
     container_name: auth-server-api
-    restart: always
+    restart: unless-stopped
     depends_on:
       db:
         condition: service_healthy
     ports:
-      - "8080:8080"
+      - "8081:8080"
     environment:
+      SPRING_PROFILES_ACTIVE: docker
       # Spring lê estas variáveis que vêm do .env via Docker Compose
-      DB_URL: ${DOCKER_DB_URL}
-      DB_USERNAME: ${DOCKER_DB_USERNAME}
-      DB_PASSWORD: ${DOCKER_DB_PASSWORD}
+      DOCKER_DB_URL: ${DOCKER_DB_URL}
+      DOCKER_DB_USERNAME: ${DOCKER_DB_USERNAME}
+      DOCKER_DB_PASSWORD: ${DOCKER_DB_PASSWORD}
       JWT_SECRET: ${JWT_SECRET}
       API_SECURITY_TOKEN_ISSUER: ${API_SECURITY_TOKEN_ISSUER}
+    networks:
+      - auth-server-network
 
+# volumes:
+#   postgres_data:
 volumes:
-  postgres_data:
+  auth_server_db_data:
+
+networks:
+  auth-server-network:
+    name: auth-server-network
+    driver: bridge
