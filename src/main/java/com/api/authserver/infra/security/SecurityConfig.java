@@ -2,6 +2,7 @@ package com.api.authserver.infra.security;
 
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -30,6 +31,10 @@ public class SecurityConfig {
 
     private final SecurityFilter securityFilter;
 
+    // Injeta o valor definido no application.yml / properties
+    @Value("${app.cors.allowed-origin}")
+    private String allowedOrigin;
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         return httpSecurity
@@ -37,10 +42,9 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.GET, "/api/users").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/users/**").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/users/create").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/roles/create").permitAll()
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // Libera Pre-flight CORS explicitamente
+                        .requestMatchers(HttpMethod.POST, "/api/users/create").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/roles/create").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
                         .anyRequest().authenticated())
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
@@ -50,6 +54,9 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
+        // Passa a variável contendo o seu domínio
+        configuration.setAllowedOrigins(List.of(allowedOrigin));
+
         configuration.setAllowedOrigins(List.of("http://localhost:5173"));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
