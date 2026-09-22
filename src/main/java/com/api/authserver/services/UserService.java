@@ -30,6 +30,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
+    private final UploadService uploadService;
 
     @Transactional
     public void saveUser(UserRequestDTO data) {
@@ -45,10 +46,16 @@ public class UserService {
 
         String encryptedPassword = passwordEncoder.encode(data.password());
 
+        String avatarFileName = null;
+        if (data.avatar() != null && !data.avatar().isEmpty()) {
+            avatarFileName = this.uploadService.uploadImg(data.avatar());
+        }
+
         User user = User.builder()
                 .name(data.name())
                 .email(data.email())
                 .password(encryptedPassword)
+                .avatar(avatarFileName)
                 .role(role)
                 .build();
 
