@@ -36,6 +36,11 @@ services:
       DOCKER_DB_PASSWORD: ${DOCKER_DB_PASSWORD}
       JWT_SECRET: ${JWT_SECRET}
       API_SECURITY_TOKEN_ISSUER: ${API_SECURITY_TOKEN_ISSUER}
+      UPLOAD_DIR: ${UPLOAD_DIR}
+      VITE_URL: ${VITE_URL}
+    volumes:
+      # 1. Volume nomeado para persistir o diretório de uploads no container
+      - auth_server_uploads:/var/lib/auth-server/uploads
     networks:
       - auth-server-network
 
@@ -43,6 +48,8 @@ services:
 #   postgres_data:
 volumes:
   auth_server_db_data:
+  # 2. Declaração do volume gerenciado pelo Docker
+  auth_server_uploads:
 
 networks:
   auth-server-network:
