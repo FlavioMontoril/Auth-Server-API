@@ -9,11 +9,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.api.authserver.domain.dtos.common.MessageResponseDTO;
 import com.api.authserver.domain.dtos.common.PageResponseDTO;
@@ -72,6 +75,16 @@ public class UserController {
     public ResponseEntity<UserWithRoleResponseDTO> getUserWithRoleById(@PathVariable UUID userId) {
         UserWithRoleResponseDTO userWithRole = userService.findUserWithRole(userId);
         return ResponseEntity.status(HttpStatus.OK).body(userWithRole);
+    }
+
+    @PatchMapping (value = "/{userId}/avatar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<MessageResponseDTO> updateAvatar(
+            @PathVariable UUID userId,
+            @RequestPart("avatar") MultipartFile avatar) {
+        userService.updateAvatar(userId, avatar);
+
+        return ResponseEntity.ok(
+                new MessageResponseDTO("Avatar updated successfully"));
     }
 
 }

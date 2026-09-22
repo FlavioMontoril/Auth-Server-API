@@ -62,4 +62,33 @@ public class UploadService {
         }
     }
 
+    public void deleteImg(String fileName) {
+
+        if (fileName == null || fileName.isBlank()) {
+            return;
+        }
+
+        try {
+            Path uploadPath = Paths
+                    .get(uploadDir)
+                    .toAbsolutePath()
+                    .normalize();
+
+            Path filePath = uploadPath
+                    .resolve(fileName)
+                    .normalize();
+
+            if (!filePath.startsWith(uploadPath)) {
+                throw new SecurityException("Caminho de arquivo inválido");
+            }
+
+            Files.deleteIfExists(filePath);
+
+        } catch (IOException e) {
+            throw new RuntimeException(
+                    "Erro ao excluir o arquivo: " + fileName,
+                    e);
+        }
+    }
+
 }
