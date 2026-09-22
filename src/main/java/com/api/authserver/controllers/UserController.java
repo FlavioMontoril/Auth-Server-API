@@ -4,15 +4,19 @@ import java.util.List;
 import java.util.UUID;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.api.authserver.domain.dtos.common.MessageResponseDTO;
 import com.api.authserver.domain.dtos.common.PageResponseDTO;
@@ -23,7 +27,6 @@ import com.api.authserver.services.UserService;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.access.prepost.PreAuthorize;
 
 @RestController
 @RequiredArgsConstructor
@@ -35,35 +38,30 @@ public class UserController {
     private final UserService userService;
 
     @DeleteMapping("/{userId}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'MASTER')")
     public ResponseEntity<MessageResponseDTO> delete(@PathVariable UUID userId) {
         userService.delete(userId);
         return ResponseEntity.status(HttpStatus.OK).body(new MessageResponseDTO("User deleted successfully"));
     }
 
-    @PostMapping
-    @PreAuthorize("hasAnyRole('ADMIN', 'MASTER')")
-    public ResponseEntity<MessageResponseDTO> create(@Valid @RequestBody UserRequestDTO data) {
+    @PostMapping(value = "/create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<MessageResponseDTO> create(@ModelAttribute @Valid UserRequestDTO data) {
         userService.saveUser(data);
         return ResponseEntity.status(HttpStatus.CREATED).body(new MessageResponseDTO("User created successfully"));
     }
 
     @GetMapping("/{userId}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'MASTER')")
     public ResponseEntity<UserResponseDTO> findById(@PathVariable UUID userId) {
         var user = userService.findUserById(userId);
         return ResponseEntity.status(HttpStatus.OK).body(user);
     }
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('ADMIN', 'MASTER')")
     public ResponseEntity<List<UserResponseDTO>> getAll() {
         var users = userService.findAllUsers();
         return ResponseEntity.status(HttpStatus.OK).body(users);
     }
 
     @GetMapping("/paged")
-    @PreAuthorize("hasAnyRole('ADMIN', 'MASTER')")
     public ResponseEntity<PageResponseDTO<UserResponseDTO>> getAllUsersPaged(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
@@ -74,10 +72,19 @@ public class UserController {
     }
 
     @GetMapping("/{userId}/role")
-    @PreAuthorize("hasAnyRole('ADMIN', 'MASTER')")
     public ResponseEntity<UserWithRoleResponseDTO> getUserWithRoleById(@PathVariable UUID userId) {
         UserWithRoleResponseDTO userWithRole = userService.findUserWithRole(userId);
         return ResponseEntity.status(HttpStatus.OK).body(userWithRole);
+    }
+
+    @PatchMapping (value = "/{userId}/avatar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<MessageResponseDTO> updateAvatar(
+            @PathVariable UUID userId,
+            @RequestPart("avatar") MultipartFile avatar) {
+        userService.updateAvatar(userId, avatar);
+
+        return ResponseEntity.ok(
+                new MessageResponseDTO("Avatar updated successfully"));
     }
 
 }

@@ -56,6 +56,10 @@ public class User implements UserDetails {
     private String password;
 
     @Setter
+    @Column(name ="avatar")
+    private String avatar;
+
+    @Setter
     @Column(nullable = false, updatable = false)
     @CreationTimestamp
     private LocalDateTime createdAt;

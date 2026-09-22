@@ -9,6 +9,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.api.authserver.domain.dtos.common.PageResponseDTO;
 import com.api.authserver.domain.dtos.user.UserRequestDTO;
@@ -30,6 +31,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
+    private final UploadService uploadService;
 
     @Transactional
     public void saveUser(UserRequestDTO data) {
@@ -45,10 +47,16 @@ public class UserService {
 
         String encryptedPassword = passwordEncoder.encode(data.password());
 
+        String avatarFileName = null;
+        if (data.avatar() != null && !data.avatar().isEmpty()) {
+            avatarFileName = this.uploadService.uploadImg(data.avatar());
+        }
+
         User user = User.builder()
                 .name(data.name())
                 .email(data.email())
                 .password(encryptedPassword)
+                .avatar(avatarFileName)
                 .role(role)
                 .build();
 
@@ -97,4 +105,31 @@ public class UserService {
                 .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado"));
         userRepository.delete(user);
     }
+
+    @Transactional
+    public void updateAvatar(UUID userId, MultipartFile avatar) {
+
+        User user = userRepository
+                .findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado"));
+
+        if (avatar == null || avatar.isEmpty()) {
+            throw new IllegalArgumentException(
+                    "Avatar é obrigatório");
+        }
+
+        // Guarda o avatar antigo
+        String oldAvatar = user.getAvatar();
+
+        // Faz upload do novo avatar
+        String newAvatar = uploadService.uploadImg(avatar);
+
+        user.setAvatar(newAvatar);
+
+        userRepository.save(user);
+
+        // Remove o arquivo antigo
+        uploadService.deleteImg(oldAvatar);
+    }
+
 }

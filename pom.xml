@@ -10,9 +10,9 @@
 	</parent>
 	<groupId>com.api</groupId>
 	<artifactId>auth-server</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.0.2</version>
 	<name>auth-server</name>
-	<description/>
+	<description>Backend do Sistema de Autenticação de Usuários</description>
 	<url/>
 	<licenses>
 		<license/>

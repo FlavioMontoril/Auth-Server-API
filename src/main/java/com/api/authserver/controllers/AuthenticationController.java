@@ -26,7 +26,6 @@ public class AuthenticationController {
     public ResponseEntity<AuthenticationResponseDTO> login(@RequestBody @Valid AuthenticationRequestDTO data, HttpServletRequest request) {
         String ipAddress = HttpUtils.getClientIpAddress(request);
         AuthenticationResponseDTO token = loginUseCaseService.executeLogin(data, ipAddress);
-        System.out.println(token);
         return ResponseEntity.ok(token);
     }
 }

@@ -12,10 +12,14 @@ FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
 
 # Cria um usuário e grupo para não rodar como root
-RUN addgroup -S spring && adduser -S spring -G spring && chown spring:spring /app
+# RUN addgroup -S spring && adduser -S spring -G spring && chown spring:spring /app
+# 1. Cria o usuário/grupo spring e a pasta de uploads com as permissões corretas
+RUN addgroup -S spring && adduser -S spring -G spring \
+    && mkdir -p /var/lib/auth-server/uploads \
+    && chown -R spring:spring /app /var/lib/auth-server
 
 # Copia o jar definindo o novo usuário como dono
-COPY --chown=spring:spring --from=build /app/target/auth-server-0.0.1-SNAPSHOT.jar /app/app.jar
+COPY --chown=spring:spring --from=build /app/target/auth-server-0.0.2.jar /app/app.jar
 
 # Define que o container deve rodar com o usuário criado
 USER spring
