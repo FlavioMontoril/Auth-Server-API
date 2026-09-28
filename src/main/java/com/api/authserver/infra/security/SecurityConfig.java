@@ -43,6 +43,7 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // Libera Pre-flight CORS explicitamente
+                        .requestMatchers("/ws/**", "/ws").permitAll()
                         .requestMatchers(HttpMethod.GET, "/uploads/**").permitAll() //Libera o acesso estático às imagens
                         .requestMatchers(HttpMethod.POST, "/api/users/create").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.POST, "/api/roles/create").hasRole("ADMIN")

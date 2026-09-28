@@ -19,7 +19,7 @@ RUN addgroup -S spring && adduser -S spring -G spring \
     && chown -R spring:spring /app /var/lib/auth-server
 
 # Copia o jar definindo o novo usuário como dono
-COPY --chown=spring:spring --from=build /app/target/auth-server-0.0.2.jar /app/app.jar
+COPY --chown=spring:spring --from=build /app/target/*.jar /app/app.jar
 
 # Define que o container deve rodar com o usuário criado
 USER spring

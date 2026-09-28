@@ -5,15 +5,16 @@ import java.util.UUID;
 
 import com.api.authserver.domain.entities.User;
 
-public record UserResponseDTO(UUID id, String name, String email, String roleId, String avatar, LocalDateTime createdAt) {
+public record UserResponseDTO(UUID id, String name, String email, String roleId, String avatar, boolean connected, LocalDateTime createdAt) {
 
-    public UserResponseDTO(User user) {
+    public UserResponseDTO(User user, boolean connected) {
         this(
                 user.getId(),
                 user.getName(),
                 user.getEmail(),
                 user.getRole().getId().toString(),
                 user.getAvatar(),
+                connected,
                 user.getCreatedAt());
     }
 }

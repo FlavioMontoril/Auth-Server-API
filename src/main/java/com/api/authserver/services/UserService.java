@@ -32,6 +32,7 @@ public class UserService {
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
     private final UploadService uploadService;
+    private final UserPresenceRegistry presenceRegistry; // Injeção do serviço
 
     @Transactional
     public void saveUser(UserRequestDTO data) {
@@ -66,7 +67,7 @@ public class UserService {
     public PageResponseDTO<UserResponseDTO> findAllUsersPagination(int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
 
-        Page<UserResponseDTO> users = userRepository.findAll(pageable).map(UserResponseDTO::new);
+        Page<UserResponseDTO> users = userRepository.findAll(pageable).map(user-> new UserResponseDTO(user, presenceRegistry.isConnected(user.getEmail())));
 
         return new PageResponseDTO<>(
                 users.getContent(),
@@ -81,14 +82,14 @@ public class UserService {
                 .findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado"));
 
-        return new UserResponseDTO(user);
+        return new UserResponseDTO(user, presenceRegistry.isConnected(user.getEmail()));
     }
 
     public List<UserResponseDTO> findAllUsers() {
         return userRepository
                 .findAllWithRoles()
                 .stream()
-                .map(UserResponseDTO::new)
+                .map(user -> new UserResponseDTO(user, presenceRegistry.isConnected(user.getEmail())))
                 .toList();
     }
 
