@@ -3,6 +3,7 @@ package com.api.authserver.services;
 import java.util.List;
 import java.util.UUID;
 
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -15,6 +16,7 @@ import com.api.authserver.domain.dtos.common.PageResponseDTO;
 import com.api.authserver.domain.dtos.user.UserRequestDTO;
 import com.api.authserver.domain.dtos.user.UserResponseDTO;
 import com.api.authserver.domain.dtos.user.UserWithRoleResponseDTO;
+import com.api.authserver.domain.dtos.user.events.UserCreatedEventDTO;
 import com.api.authserver.domain.entities.Role;
 import com.api.authserver.domain.entities.User;
 import com.api.authserver.domain.exceptions.DataConflictException;
@@ -32,7 +34,8 @@ public class UserService {
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
     private final UploadService uploadService;
-    private final UserPresenceRegistry presenceRegistry; // Injeção do serviço
+    private final UserPresenceRegistry presenceRegistry;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
     public void saveUser(UserRequestDTO data) {
@@ -61,13 +64,23 @@ public class UserService {
                 .role(role)
                 .build();
 
-        userRepository.save(user);
+        User newUser = userRepository.save(user);
+
+        // Dispara o evento interno do Spring.
+        // O @TransactionalEventListener só enviará ao Kafka após o COMMIT desta
+        // transação ser efetuado com sucesso.
+        eventPublisher.publishEvent(new UserCreatedEventDTO(
+                newUser.getId().toString(),
+                newUser.getName(),
+                newUser.getEmail()
+            ));
     }
 
     public PageResponseDTO<UserResponseDTO> findAllUsersPagination(int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
 
-        Page<UserResponseDTO> users = userRepository.findAll(pageable).map(user-> new UserResponseDTO(user, presenceRegistry.isConnected(user.getEmail())));
+        Page<UserResponseDTO> users = userRepository.findAll(pageable)
+                .map(user -> new UserResponseDTO(user, presenceRegistry.isConnected(user.getEmail())));
 
         return new PageResponseDTO<>(
                 users.getContent(),
