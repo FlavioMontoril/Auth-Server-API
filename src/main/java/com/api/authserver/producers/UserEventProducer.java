@@ -1,4 +1,4 @@
-package com.api.authserver.producer;
+package com.api.authserver.producers;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -12,7 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j 
 @Component
 @RequiredArgsConstructor 
-public class UserProducer {
+public class UserEventProducer {
 
     private final KafkaTemplate<String, Object> kafkaTemplate;
 

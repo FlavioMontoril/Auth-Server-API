@@ -45,7 +45,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // Libera Pre-flight CORS explicitamente
                         .requestMatchers("/ws/**", "/ws").permitAll()
                         .requestMatchers(HttpMethod.GET, "/uploads/**").permitAll() //Libera o acesso estático às imagens
-                        .requestMatchers(HttpMethod.POST, "/api/users/create").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/users/create").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.POST, "/api/roles/create").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
                         .anyRequest().authenticated())

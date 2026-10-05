@@ -5,7 +5,7 @@ import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 
 import com.api.authserver.domain.dtos.user.events.UserCreatedEventDTO;
-import com.api.authserver.producer.UserProducer;
+import com.api.authserver.producers.UserEventProducer;
 
 import lombok.RequiredArgsConstructor;
 
@@ -13,7 +13,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class UserTransactionListener {
 
-    private final UserProducer userProducer;
+    private final UserEventProducer userProducer;
 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleUserCreatedCommit(UserCreatedEventDTO internalEvent) {

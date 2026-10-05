@@ -40,14 +40,11 @@ public class UserService {
     @Transactional
     public void saveUser(UserRequestDTO data) {
 
-        userRepository
-                .findByEmail(data.email())
-                .ifPresent(user -> {
-                    throw new DataConflictException("Existe usuário cadastrado com este email no sistema");
-                });
+        if (userRepository.existsByEmail(data.email())) {
+                throw new DataConflictException("Existe usuário cadastrado com este email no sistema");
+        }
 
-        Role role = roleRepository.findById(data.roleId())
-                .orElseThrow(() -> new ResourceNotFoundException("Role Not Found"));
+        Role role = roleRepository.getReferenceById(data.roleId());
 
         String encryptedPassword = passwordEncoder.encode(data.password());
 
