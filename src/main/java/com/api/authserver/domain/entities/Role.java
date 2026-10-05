@@ -25,11 +25,11 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Builder
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "roles")
+@Builder
 public class Role {
 
     @Id
