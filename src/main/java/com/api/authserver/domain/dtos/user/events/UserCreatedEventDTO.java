@@ -5,5 +5,6 @@ import java.io.Serializable;
 public record UserCreatedEventDTO(
     String id,
     String name,
-    String email
+    String email,
+    String role
 ) implements Serializable {}

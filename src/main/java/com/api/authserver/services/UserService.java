@@ -63,13 +63,16 @@ public class UserService {
 
         User newUser = userRepository.save(user);
 
+        String roleName = newUser.getRole().getName().name(); // Se RoleName for Enum (ex: RoleName.ADMIN)
+
         // Dispara o evento interno do Spring.
         // O @TransactionalEventListener só enviará ao Kafka após o COMMIT desta
         // transação ser efetuado com sucesso.
         eventPublisher.publishEvent(new UserCreatedEventDTO(
                 newUser.getId().toString(),
                 newUser.getName(),
-                newUser.getEmail()
+                newUser.getEmail(),
+                roleName
             ));
     }
 

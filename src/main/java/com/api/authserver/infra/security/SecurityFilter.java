@@ -26,13 +26,13 @@ public class SecurityFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
 
         // 1. Extrai o token do Header "Authorization"
-        var token = this.recoverToken(request);
+        var token = recoverToken(request);
 
         if (token != null) {
             // 2. Valida o token e pega o e-mail (username) do usuário
             var login = tokenService.validateToken(token);
 
-            if (login != null) {
+            if (login != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                 // 3. Busca o usuário no banco de dados
                 UserDetails user = userDetailsService.loadUserByUsername(login);
 
@@ -53,9 +53,10 @@ public class SecurityFilter extends OncePerRequestFilter {
     // Método auxiliar para extrair o token limpo (sem a palavra "Bearer ")
     private String recoverToken(HttpServletRequest request) {
         var authHeader = request.getHeader("Authorization");
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            return null;
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            return authHeader.substring(7);
+            // return authHeader.replace("Bearer ", "");
         }
-        return authHeader.replace("Bearer ", "");
+        return null;
     }
 }

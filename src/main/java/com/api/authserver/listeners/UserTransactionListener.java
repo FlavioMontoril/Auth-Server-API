@@ -20,7 +20,8 @@ public class UserTransactionListener {
         UserCreatedEventDTO kafkaEvent = new UserCreatedEventDTO(
                 internalEvent.id().toString(),
                 internalEvent.name(),
-                internalEvent.email());
+                internalEvent.email(),
+                internalEvent.role());
         userProducer.sendUserCreatedEvent(kafkaEvent);
     }
 }
